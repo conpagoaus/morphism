@@ -13,12 +13,12 @@ describe('Tree', () => {
       const root: SchemaNode<Target, {}> = {
         data: { targetPropertyPath: '', propertyName: 'MorphismTreeRoot', action: null, kind: NodeKind.Root },
         parent: null,
-        children: []
+        children: [],
       };
       const result: SchemaNode<Target, {}> = {
         data: { targetPropertyPath: 'keyA', propertyName: 'keyA', action: 'keyA', kind: NodeKind.ActionString },
         parent: root,
-        children: []
+        children: [],
       };
 
       expect(tree.root.data).toEqual(root.data);
@@ -38,19 +38,19 @@ describe('Tree', () => {
       }
       const tree = new MorphismSchemaTree<Target, {}>({});
       const parentTargetPropertyPath = 'keyA';
-      tree.add({ action: null, propertyName: 'keyA', targetPropertyPath: parentTargetPropertyPath });
+      tree.add({ action: {}, propertyName: 'keyA', targetPropertyPath: parentTargetPropertyPath });
       tree.add({ action: 'keyA', propertyName: 'keyA1' }, parentTargetPropertyPath);
 
       const nodeKeyA: SchemaNode<Target, {}> = {
-        data: { targetPropertyPath: 'keyA', propertyName: 'keyA', action: null, kind: NodeKind.Property },
+        data: { targetPropertyPath: 'keyA', propertyName: 'keyA', action: {}, kind: NodeKind.Property },
         parent: null,
-        children: []
+        children: [],
       };
 
       const nodeKeyA1: SchemaNode<Target, {}> = {
         data: { targetPropertyPath: 'keyA.keyA1', propertyName: 'keyA1', action: 'keyA', kind: NodeKind.ActionString },
         parent: null,
-        children: []
+        children: [],
       };
 
       // KeyA
@@ -80,13 +80,13 @@ describe('Tree', () => {
         propertyName: 'keyA',
         targetPropertyPath: 'keyA',
         kind: NodeKind.ActionString,
-        action: 'test'
+        action: 'test',
       };
 
       let result;
       for (const node of tree.traverseBFS()) {
         const {
-          data: { propertyName, targetPropertyPath, kind, action }
+          data: { propertyName, targetPropertyPath, kind, action },
         } = node;
         result = { propertyName, targetPropertyPath, kind, action };
       }
@@ -108,7 +108,7 @@ describe('Tree', () => {
       const mockAction = 'action-string';
       const schema: StrictSchema<Target> = {
         keyA: { keyA1: mockAction },
-        keyB: { keyB1: { keyB11: mockAction } }
+        keyB: { keyB1: { keyB11: mockAction } },
       };
       const tree = new MorphismSchemaTree(schema);
 
@@ -117,38 +117,38 @@ describe('Tree', () => {
           propertyName: 'keyA',
           targetPropertyPath: 'keyA',
           kind: NodeKind.Property,
-          action: null
+          action: { keyA1: mockAction },
         },
         {
           propertyName: 'keyB',
           targetPropertyPath: 'keyB',
           kind: NodeKind.Property,
-          action: null
+          action: { keyB1: { keyB11: mockAction } },
         },
         {
           propertyName: 'keyA1',
           targetPropertyPath: 'keyA.keyA1',
           kind: NodeKind.ActionString,
-          action: mockAction
+          action: mockAction,
         },
         {
           propertyName: 'keyB1',
           targetPropertyPath: 'keyB.keyB1',
           kind: NodeKind.Property,
-          action: null
+          action: { keyB11: mockAction },
         },
         {
           propertyName: 'keyB11',
           targetPropertyPath: 'keyB.keyB1.keyB11',
           kind: NodeKind.ActionString,
-          action: mockAction
-        }
+          action: mockAction,
+        },
       ];
 
       let results = [];
       for (const node of tree.traverseBFS()) {
         const {
-          data: { propertyName, targetPropertyPath, kind, action }
+          data: { propertyName, targetPropertyPath, kind, action },
         } = node;
         results.push({ propertyName, targetPropertyPath, kind, action });
       }
@@ -172,59 +172,71 @@ describe('Tree', () => {
 
       const mockAction = 'action-string';
       const schema: StrictSchema<Target> = {
-        keyA: [{ keyA1: mockAction, keyA2: mockAction }, { keyB1: mockAction, keyB2: mockAction }]
+        keyA: [
+          { keyA1: mockAction, keyA2: mockAction },
+          { keyB1: mockAction, keyB2: mockAction },
+        ],
       };
       const tree = new MorphismSchemaTree(schema);
 
       const expected = [
         {
-          action: null,
+          action: [
+            {
+              keyA1: mockAction,
+              keyA2: mockAction,
+            },
+            {
+              keyB1: mockAction,
+              keyB2: mockAction,
+            },
+          ],
           kind: 'Property',
           propertyName: 'keyA',
-          targetPropertyPath: 'keyA'
+          targetPropertyPath: 'keyA',
         },
         {
-          action: null,
+          action: { keyA1: mockAction, keyA2: mockAction },
           kind: 'Property',
           propertyName: '0',
-          targetPropertyPath: 'keyA.0'
+          targetPropertyPath: 'keyA.0',
         },
         {
-          action: null,
+          action: { keyB1: mockAction, keyB2: mockAction },
           kind: 'Property',
           propertyName: '1',
-          targetPropertyPath: 'keyA.1'
+          targetPropertyPath: 'keyA.1',
         },
         {
           action: 'action-string',
           kind: 'ActionString',
           propertyName: 'keyA1',
-          targetPropertyPath: 'keyA.0.keyA1'
+          targetPropertyPath: 'keyA.0.keyA1',
         },
         {
           action: 'action-string',
           kind: 'ActionString',
           propertyName: 'keyA2',
-          targetPropertyPath: 'keyA.0.keyA2'
+          targetPropertyPath: 'keyA.0.keyA2',
         },
         {
           action: 'action-string',
           kind: 'ActionString',
           propertyName: 'keyB1',
-          targetPropertyPath: 'keyA.1.keyB1'
+          targetPropertyPath: 'keyA.1.keyB1',
         },
         {
           action: 'action-string',
           kind: 'ActionString',
           propertyName: 'keyB2',
-          targetPropertyPath: 'keyA.1.keyB2'
-        }
+          targetPropertyPath: 'keyA.1.keyB2',
+        },
       ];
 
       let results = [];
       for (const node of tree.traverseBFS()) {
         const {
-          data: { propertyName, targetPropertyPath, kind, action }
+          data: { propertyName, targetPropertyPath, kind, action },
         } = node;
         results.push({ propertyName, targetPropertyPath, kind, action });
       }

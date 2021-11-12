@@ -3,10 +3,11 @@ import webpack from 'webpack';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import NodemonPlugin from 'nodemon-webpack-plugin';
 import ModuleDependencyWarning from 'webpack/lib/ModuleDependencyWarning';
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 const isProd = nodeEnv === 'production';
-
+const shouldAnalyzeBundle = process.env.WEBPACK_ANALYZE;
 class IgnoreNotFoundExportPlugin {
   apply(compiler) {
     const messageRegExp = /export '.*'( \(reexported as '.*'\))? was not found in/;
@@ -27,6 +28,7 @@ class IgnoreNotFoundExportPlugin {
 }
 
 const webpackconfiguration: webpack.Configuration = {
+  mode: 'development',
   entry: path.resolve(__dirname, 'src', 'morphism.ts'),
   devtool: isProd ? 'hidden-source-map' : 'source-map',
   output: {
@@ -35,25 +37,25 @@ const webpackconfiguration: webpack.Configuration = {
     libraryTarget: 'umd',
     globalObject: 'this',
     sourceMapFilename: 'morphism.map',
-    library: 'Morphism'
+    library: 'Morphism',
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.json']
+    extensions: ['.ts', '.tsx', '.js', '.json'],
   },
   module: {
-    rules: [{ test: /\.(ts|js)x?$/, use: ['babel-loader', 'source-map-loader'], exclude: /node_modules/ }]
+    rules: [{ test: /\.(ts|js)x?$/, use: ['babel-loader', 'source-map-loader'], exclude: /node_modules/ }],
   },
   plugins: [
     new ForkTsCheckerWebpackPlugin({
       async: false,
       checkSyntacticErrors: true,
       reportFiles: ['**', '!**/*.json', '!**/__tests__/**', '!**/?(*.)(spec|test).*'],
-      watch: './src',
-      silent: true
+      silent: true,
     }),
     new NodemonPlugin(),
-    new IgnoreNotFoundExportPlugin()
-  ]
+    new IgnoreNotFoundExportPlugin(),
+    shouldAnalyzeBundle ? new BundleAnalyzerPlugin({ generateStatsFile: true }) : null,
+  ].filter(plugin => plugin),
 };
 
 export default webpackconfiguration;

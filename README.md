@@ -4,13 +4,11 @@
 <img src="https://i.imgur.com/4muW6u2.jpg" width="800px">
 </div> -->
 
-[![npm](https://img.shields.io/npm/v/morphism.svg?style=for-the-badge)][npm-url]
+[![Financial Contributors on Open Collective](https://opencollective.com/morphism/all/badge.svg?label=financial+contributors)](https://opencollective.com/morphism) [![npm](https://img.shields.io/npm/v/morphism.svg?style=for-the-badge)][npm-url]
 [![npm bundle size (minified)](https://img.shields.io/bundlephobia/min/morphism.svg?style=for-the-badge)](https://github.com/nobrainr/morphism)
 [![npm](https://img.shields.io/npm/dy/morphism.svg?style=for-the-badge)][trends-url]
-[![Coveralls github](https://img.shields.io/coveralls/github/emyann/morphism.svg?style=for-the-badge)][coveralls-url]
 [![CircleCI (all branches)](https://img.shields.io/circleci/project/github/nobrainr/morphism/master.svg?style=for-the-badge)][circleci-url]
 [![Deps](https://img.shields.io/david/nobrainr/morphism.svg?style=for-the-badge)][deps-url]
-[![Greenkeeper badge](https://badges.greenkeeper.io/nobrainr/morphism.svg)](https://greenkeeper.io/)
 
 > In many fields of mathematics, morphism refers to a structure-preserving map from one mathematical structure to another. A morphism **f** with source **X** and target **Y** is written **f : X → Y**. Thus a morphism is represented by an arrow from its **source** to its **target**.
 
@@ -22,40 +20,40 @@ _https://en.wikipedia.org/wiki/Morphism_
 
 ---
 
-- [Morphism](#morphism)
-  - [Getting started](#getting-started)
-    - [Installation](#installation)
-    - [Usage](#usage)
-    - [Example (TypeScript)](#example-typescript)
-  - [Motivation](#motivation)
-  - [TypeScript integration](#typescript-integration)
-  - [Docs](#docs)
-    - [1. The Schema](#1-the-schema)
-      - [Schema actions](#schema-actions)
-      - [Schema Example](#schema-example)
-      - [1.1 Using a strict Schema](#11-using-a-strict-schema)
-    - [2. Morphism as Currying Function](#2-morphism-as-currying-function)
-      - [API](#api)
-      - [Currying Function Example](#currying-function-example)
-    - [3. Morphism Function as Decorators](#3-morphism-function-as-decorators)
-      - [`toJsObject` Decorator](#tojsobject-decorator)
-      - [`toClassObject` Decorator](#toclassobject-decorator)
-      - [`morph` Decorator](#morph-decorator)
-    - [4. Default export: Morphism object](#4-default-export-morphism-object)
-  - [More Schema examples](#more-schema-examples)
-    - [Flattening or Projection](#flattening-or-projection)
-    - [Function over a source property's value](#function-over-a-source-propertys-value)
-    - [Function over a source property](#function-over-a-source-property)
-    - [Properties Aggregation](#properties-aggregation)
-  - [Registry API](#registry-api)
-      - [Register](#register)
-      - [Map](#map)
-      - [Get or Set an existing mapper configuration](#get-or-set-an-existing-mapper-configuration)
-      - [Delete a registered mapper](#delete-a-registered-mapper)
-      - [List registered mappers](#list-registered-mappers)
-  - [Contribution](#contribution)
-  - [Similar Projects](#similar-projects)
-  - [License](#license)
+- [Morphism](#Morphism)
+  - [Getting started](#Getting-started)
+    - [Installation](#Installation)
+    - [Usage](#Usage)
+    - [Example (TypeScript)](#Example-TypeScript)
+  - [Motivation](#Motivation)
+  - [TypeScript integration](#TypeScript-integration)
+  - [Docs](#Docs)
+    - [1. The Schema](#1-The-Schema)
+      - [Schema actions](#Schema-actions)
+      - [Schema Example](#Schema-Example)
+      - [1.1 Using a strict Schema](#11-Using-a-strict-Schema)
+    - [2. Morphism as Currying Function](#2-Morphism-as-Currying-Function)
+      - [API](#API)
+      - [Currying Function Example](#Currying-Function-Example)
+    - [3. Morphism Function as Decorators](#3-Morphism-Function-as-Decorators)
+      - [`toJsObject` Decorator](#toJsObject-Decorator)
+      - [`toClassObject` Decorator](#toClassObject-Decorator)
+      - [`morph` Decorator](#morph-Decorator)
+    - [4. Default export: Morphism object](#4-Default-export-Morphism-object)
+  - [More Schema examples](#More-Schema-examples)
+    - [Flattening or Projection](#Flattening-or-Projection)
+    - [Function over a source property's value](#Function-over-a-source-propertys-value)
+    - [Function over a source property](#Function-over-a-source-property)
+    - [Properties Aggregation](#Properties-Aggregation)
+  - [Registry API](#Registry-API)
+    - [Register](#Register)
+    - [Map](#Map)
+    - [Get or Set an existing mapper configuration](#Get-or-Set-an-existing-mapper-configuration)
+    - [Delete a registered mapper](#Delete-a-registered-mapper)
+    - [List registered mappers](#List-registered-mappers)
+  - [Contribution](#Contribution)
+  - [Similar Projects](#Similar-Projects)
+  - [License](#License)
 
 ## Getting started
 
@@ -83,8 +81,8 @@ const schema = {
   targetProperty: 'sourceProperty'
 };
 ```
-Then use the `morphism` function along with the **schema** to transform any **source** to your desired **target**
 
+Then use the `morphism` function along with the **schema** to transform any **source** to your desired **target**
 
 ```typescript
 import { morphism } from 'morphism';
@@ -104,20 +102,20 @@ morphism(schema, source);
 }
 ```
 
-You may specify properties deep within the source object to be copied to your desired target by using dot notation in the mapping `value`. 
+You may specify properties deep within the source object to be copied to your desired target by using dot notation in the mapping `value`.
 This is [one of the actions available](#schema-actions) to transform the source data
 
 ```typescript
 const schema = {
   foo: 'deep.foo',
   bar: {
-	baz: 'deep.foo'
+    baz: 'deep.foo'
   }
 };
 
 const source = {
   deep: {
-	foo: 'value'
+    foo: 'value'
   }
 };
 
@@ -195,7 +193,7 @@ morphism(schema, sources);
 
 ## Motivation
 
-We live in a era where we deal with mutiple data contracts coming from several sources (Rest API, Services, Raw JSON...). When it comes to transform multiple data contracts to match with your domain objects, it's common to create your objects with `Object.assign`, `new Object(sourceProperty1, sourceProperty2)` or by simply assigning each source properties to your destination. This can leads you to have your business logic spread all over the place.
+We live in a era where we deal with mutiple data contracts coming from several sources (Rest API, Services, Raw JSON...). When it comes to transform multiple data contracts to match with your domain objects, it's common to create your objects with `Object.assign`, `new Object(sourceProperty1, sourceProperty2)` or by simply assigning each source properties to your destination. This can result in your business logic being spread all over the place.
 
 `Morphism` allows you to keep this business logic centralized and brings you a top-down view of your data transformation. When a contract change occurs, it helps to track the bug since you just need to refer to your `schema`
 
@@ -206,7 +204,6 @@ When you type your schema, this library will require you to specify each transfo
 ![schema](https://raw.githubusercontent.com/nobrainr/morphism/master/images/schema.png)
 
 ![schema-required-fields](https://raw.githubusercontent.com/nobrainr/morphism/master/images/schema-required-fields.png)
-
 
 This library uses TypeScript extensively. The target type will be inferred from the defined schema.
 
@@ -285,9 +282,9 @@ morphism(schema, input);
 
 ▶️ [Test with Repl.it](https://repl.it/@yrnd1/Morphism-Schema-Options)
 
-⏩ [More Schema examples](#more-schema-examples-%F0%9F%92%A1)
+⏩ [More Schema examples](#more-schema-examples)
 
-📚 [Schema Docs](https://morphism.now.sh/interfaces/morphism.schema)
+📚 [Schema Docs](https://morphism.now.sh/classes/_morphismtree_.morphismschematree)
 
 #### 1.1 Using a strict Schema
 
@@ -323,6 +320,7 @@ import { morphism } from 'morphism';
 morphism(schema: Schema, items?: any, type?: any): any
 ```
 
+<!-- ! Broken link -->
 📚 [Currying Function Docs](https://morphism.now.sh/modules/morphism#morphism-1)
 
 #### Currying Function Example
@@ -476,6 +474,8 @@ class Service {
 // }
 ```
 
+📚 [Morphism Function as Decorators Docs](https://morphism.now.sh/modules/_morphism_)
+
 ### 4. Default export: Morphism object
 
 Morphism comes along with an internal registry you can use to save your schema attached to a specific **ES6 Class**.
@@ -595,7 +595,7 @@ morphism(schema, source);
 
 ## Registry API
 
-📚 [Registry API Documentation](https://morphism.now.sh/classes/morphism.morphismregistry.html)
+📚 [Registry API Documentation](https://morphism.now.sh/classes/_morphismregistry_.morphismregistry)
 
 #### Register
 
@@ -639,10 +639,42 @@ Morphism.mappers;
 
 ## Similar Projects
 
+- [`io-ts`](https://github.com/gcanti/io-ts)
+- [`joi`](https://github.com/hapijs/joi/)
 - [`object-mapper`](https://www.npmjs.com/package/object-mapper)
 - [`autoMapper-ts`](https://www.npmjs.com/package/automapper-ts)
 - [`C# AutoMapper`](https://github.com/AutoMapper/AutoMapper)
 - [`node-data-transform`](https://github.com/bozzltron/node-json-transform)
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+<a href="https://github.com/nobrainr/morphism/graphs/contributors"><img src="https://opencollective.com/morphism/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/morphism/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/morphism"><img src="https://opencollective.com/morphism/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/morphism/contribute)]
+
+<a href="https://opencollective.com/morphism/organization/0/website"><img src="https://opencollective.com/morphism/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/morphism/organization/1/website"><img src="https://opencollective.com/morphism/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/morphism/organization/2/website"><img src="https://opencollective.com/morphism/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/morphism/organization/3/website"><img src="https://opencollective.com/morphism/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/morphism/organization/4/website"><img src="https://opencollective.com/morphism/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/morphism/organization/5/website"><img src="https://opencollective.com/morphism/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/morphism/organization/6/website"><img src="https://opencollective.com/morphism/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/morphism/organization/7/website"><img src="https://opencollective.com/morphism/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/morphism/organization/8/website"><img src="https://opencollective.com/morphism/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/morphism/organization/9/website"><img src="https://opencollective.com/morphism/organization/9/avatar.svg"></a>
 
 ## License
 
@@ -652,7 +684,5 @@ MIT © [Yann Renaudin][twitter-account]
 [npm-image]: https://badge.fury.io/js/morphism.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/morphism
 [deps-url]: https://www.npmjs.com/package/morphism?activeTab=dependencies
-[coveralls-image]: https://coveralls.io/repos/emyann/morphism/badge.svg?style=flat-square
-[coveralls-url]: https://coveralls.io/r/emyann/morphism
 [circleci-url]: https://circleci.com/gh/nobrainr/morphism
 [trends-url]: https://www.npmtrends.com/morphism

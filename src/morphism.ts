@@ -6,6 +6,10 @@ import { Schema, StrictSchema, Constructable, SourceFromSchema, Mapper, Destinat
 import { MorphismSchemaTree, createSchema, SchemaOptions } from './MorphismTree';
 import { MorphismRegistry, IMorphismRegistry } from './MorphismRegistry';
 import { decorator } from './MorphismDecorator';
+import { Reporter, reporter as defaultReporter, Formatter, targetHasErrors, ValidationErrors } from './validation/reporter';
+import { Validation, IValidation } from './validation/Validation';
+import { ValidatorError } from './validation/validators/ValidatorError';
+import { Rule } from './validation/validators/types';
 
 /**
  * Low Level transformer function.
@@ -26,7 +30,11 @@ function transformValuesFromObject<Source, Target>(
 
   for (const node of tree.traverseBFS()) {
     const { preparedAction, targetPropertyPath } = node.data;
-    if (preparedAction) transformChunks.push({ targetPropertyPath, preparedAction: preparedAction({ object, objectToCompute, items }) });
+    if (preparedAction)
+      transformChunks.push({
+        targetPropertyPath,
+        preparedAction: preparedAction({ object, objectToCompute, items }),
+      });
   }
 
   return transformChunks.reduce((finalObject, chunk) => {
@@ -54,12 +62,31 @@ function transformValuesFromObject<Source, Target>(
         // do not strip undefined values
         set(finalObject, chunk.targetPropertyPath, finalValue);
       }
+      checkIfValidationShouldThrow<Target>(options, finalObject);
       return finalObject;
     } else {
       set(finalObject, chunk.targetPropertyPath, finalValue);
+      checkIfValidationShouldThrow<Target>(options, finalObject);
       return finalObject;
     }
   }, objectToCompute);
+}
+
+function checkIfValidationShouldThrow<Target>(options: SchemaOptions<Target>, finalObject: Target) {
+  if (options && options.validation && options.validation.throw) {
+    if (targetHasErrors(finalObject)) {
+      let errors: ValidationErrors | null;
+      if (options.validation.reporter) {
+        const reporter = options.validation.reporter;
+        errors = reporter.extractErrors(finalObject);
+      } else {
+        errors = defaultReporter.extractErrors(finalObject);
+      }
+      if (errors) {
+        throw errors;
+      }
+    }
+  }
 }
 
 function transformItems<T, TSchema extends Schema<T | {}>>(schema: TSchema, type?: Constructable<T>) {
@@ -226,5 +253,20 @@ morphismMixin.mappers = morphismRegistry.mappers;
 
 const Morphism: typeof morphism & IMorphismRegistry = morphismMixin;
 
-export { morphism, createSchema, Schema, StrictSchema, SchemaOptions, Mapper, SCHEMA_OPTIONS_SYMBOL };
+export {
+  morphism,
+  createSchema,
+  Schema,
+  StrictSchema,
+  SchemaOptions,
+  Mapper,
+  SCHEMA_OPTIONS_SYMBOL,
+  Reporter,
+  defaultReporter as reporter,
+  Formatter,
+  Validation,
+  Rule,
+  ValidatorError,
+  IValidation,
+};
 export default Morphism;

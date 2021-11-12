@@ -1,4 +1,4 @@
-import { SCHEMA_OPTIONS_SYMBOL, SchemaOptions } from "./morphism";
+import { SCHEMA_OPTIONS_SYMBOL, SchemaOptions, ValidatorError } from './morphism';
 
 /**
  * A structure-preserving object from a source data towards a target data.
@@ -36,11 +36,7 @@ export type StrictSchema<Target = any, Source = any> = {
   [destinationProperty in keyof Target]:
     | ActionString<Source>
     | {
-        (
-          iteratee: Source,
-          source: Source[],
-          target: Target[destinationProperty]
-        ): Target[destinationProperty];
+        (iteratee: Source, source: Source[], target: Target[destinationProperty]): Target[destinationProperty];
       }
     | ActionAggregator<Source>
     | ActionSelector<Source, Target, destinationProperty>
@@ -51,22 +47,14 @@ export type Schema<Target = any, Source = any> = {
   [destinationProperty in keyof Target]?:
     | ActionString<Source>
     | {
-        (
-          iteratee: Source,
-          source: Source[],
-          target: Target[destinationProperty]
-        ): Target[destinationProperty];
+        (iteratee: Source, source: Source[], target: Target[destinationProperty]): Target[destinationProperty];
       }
     | ActionAggregator<Source>
     | ActionSelector<Source, Target, destinationProperty>
     | Schema<Target[destinationProperty], Source>;
 } & { [SCHEMA_OPTIONS_SYMBOL]?: SchemaOptions<Target | any> };
 
-export type Actions<Target, Source> =
-  | ActionFunction<Target, Source>
-  | ActionAggregator
-  | ActionString<Target>
-  | ActionSelector<Source>;
+export type Actions<Target, Source> = ActionFunction<Target, Source> | ActionAggregator | ActionString<Target> | ActionSelector<Source>;
 
 /**
  * @interface ActionFunction
@@ -125,7 +113,7 @@ export interface ActionFunction<D = any, S = any, R = any> {
  * ```
  *
  */
-export type ActionString<Source> = string; // TODO: ActionString should support string and string[] for deep properties
+export type ActionString<Source> = string | keyof Source; // TODO: ActionString should support string and string[] for deep properties
 
 /**
  * An Array of String that allows to perform a function over source property
@@ -145,9 +133,7 @@ export type ActionString<Source> = string; // TODO: ActionString should support 
  * //=> { fooAndBar: { foo: 'foo', bar: 'bar' } }
  * ```
  */
-export type ActionAggregator<T extends unknown = unknown> = T extends object
-  ? (keyof T)[] | string[]
-  : string[];
+export type ActionAggregator<T extends unknown = unknown> = T extends object ? (keyof T)[] | string[] : string[];
 /**
  * @interface ActionSelector
  * @typeparam Source Source/Input Type
@@ -175,41 +161,34 @@ export type ActionAggregator<T extends unknown = unknown> = T extends object
  *```
  *
  */
-export interface ActionSelector<
-  Source = object,
-  Target = any,
-  TargetProperty extends keyof Target = any
-> {
-  path: ActionString<Source> | ActionAggregator<Source>;
-  fn: (
-    fieldValue: any,
-    object: Source,
-    items: Source,
-    objectToCompute: Target
-  ) => Target[TargetProperty];
+export interface ActionSelector<Source = object, Target = any, TargetProperty extends keyof Target = any> {
+  path?: ActionString<Source> | ActionAggregator<Source>;
+  fn?: (fieldValue: any, object: Source, items: Source, objectToCompute: Target) => Target[TargetProperty];
+  validation?: ValidateFunction;
 }
+
+export interface ValidatorValidateResult {
+  value: any;
+  error?: ValidatorError;
+}
+export type ValidateFunction = (input: { value: any }) => ValidatorValidateResult;
 
 export interface Constructable<T> {
   new (...args: any[]): T;
 }
 
-export type SourceFromSchema<T> = T extends
-  | StrictSchema<unknown, infer U>
-  | Schema<unknown, infer U>
-  ? U
-  : never;
-export type DestinationFromSchema<T> = T extends
-  | StrictSchema<infer U>
-  | Schema<infer U>
-  ? U
-  : never;
+export type SourceFromSchema<T> = T extends StrictSchema<unknown, infer U> | Schema<unknown, infer U> ? U : never;
+export type DestinationFromSchema<T> = T extends StrictSchema<infer U> | Schema<infer U> ? U : never;
 
 export type ResultItem<TSchema extends Schema> = DestinationFromSchema<TSchema>;
 
-export interface Mapper<
-  TSchema extends Schema | StrictSchema,
-  TResult = ResultItem<TSchema>
-> {
+/**
+ * Function to map an Input source towards a Target. Input can be a single object, or a collection of objects
+ * @function
+ * @typeparam TSchema Schema
+ * @typeparam TResult Result Type
+ */
+export interface Mapper<TSchema extends Schema | StrictSchema, TResult = ResultItem<TSchema>> {
   (data?: SourceFromSchema<TSchema>[] | null): TResult[];
   (data?: SourceFromSchema<TSchema> | null): TResult;
 }
