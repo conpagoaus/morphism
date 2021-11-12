@@ -1,6 +1,6 @@
 {
   "name": "morphism",
-  "version": "1.0.0",
+  "version": "2.1.5",
   "description": "Type-safe object transformer for JavaScript, TypeScript & Node.js. ",
   "homepage": "https://github.com/nobrainr/morphism",
   "main": "./dist/morphism.js",
