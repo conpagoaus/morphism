@@ -91,7 +91,7 @@ describe('Morphism', () => {
       const schema: StrictSchema<Destination, Source> = {
         foo: 'bar',
         bar: 'bar',
-        qux: elem => elem.bar,
+        qux: (elem) => elem.bar,
       };
       const source = { bar: 'value' };
 
@@ -140,21 +140,21 @@ describe('Morphism', () => {
     });
   });
 
-  describe('Plain Objects', function() {
-    it('should export Morphism function curried function', function() {
+  describe('Plain Objects', function () {
+    it('should export Morphism function curried function', function () {
       expect(typeof Morphism).toEqual('function');
     });
 
-    it('should provide a mapper function from the partial application', function() {
+    it('should provide a mapper function from the partial application', function () {
       let fn = Morphism({});
       expect(typeof fn).toEqual('function');
     });
 
-    it('should provide an Object as result when Morphism is applied on an Object', function() {
+    it('should provide an Object as result when Morphism is applied on an Object', function () {
       expect(Morphism({}, {})).toEqual({});
     });
 
-    it('should throw an exception when trying to access a path from an undefined object', function() {
+    it('should throw an exception when trying to access a path from an undefined object', function () {
       Morphism.setMapper<User, any>(User, {
         fieldWillThrow: {
           path: 'fieldWillThrow.becauseNotReachable',
@@ -171,7 +171,7 @@ describe('Morphism', () => {
       expect(applyMapping).toThrow();
     });
 
-    it('should rethrow an exception when applying a function on path throws an error', function() {
+    it('should rethrow an exception when applying a function on path throws an error', function () {
       const err = new TypeError('an internal error');
       Morphism.setMapper<User, any>(User, {
         fieldWillThrow: {
@@ -189,12 +189,12 @@ describe('Morphism', () => {
     });
   });
 
-  describe('Collection of Objects', function() {
-    it('should morph an empty array to an empty array || m({}, []) => []', function() {
+  describe('Collection of Objects', function () {
+    it('should morph an empty array to an empty array || m({}, []) => []', function () {
       expect(Morphism({}, [])).toEqual([]);
     });
 
-    it('should morph a collection of objects with a stored function || mapObject([{}]) => [Object{}]', function() {
+    it('should morph a collection of objects with a stored function || mapObject([{}]) => [Object{}]', function () {
       const input = [
         {
           firstName: 'John',
@@ -229,30 +229,30 @@ describe('Morphism', () => {
       const mapUser = Morphism.register(User, schema);
       const results = mapUser(input);
       results.forEach((res, index) => {
-        expect(res).toEqual(jasmine.objectContaining(output[index]));
+        expect(res).toEqual(expect.objectContaining(output[index]));
       });
 
       const mapUser2 = Morphism(schema, null, User);
       const results2 = mapUser2(input);
 
       results2.forEach((res, index) => {
-        expect(res).toEqual(jasmine.objectContaining(output[index]));
+        expect(res).toEqual(expect.objectContaining(output[index]));
       });
 
       const results3 = Morphism.map(User, input);
       results3.forEach((res, index) => {
-        expect(res).toEqual(jasmine.objectContaining(output[index]));
+        expect(res).toEqual(expect.objectContaining(output[index]));
       });
 
-      const results4 = input.map(userInput => Morphism.map(User, userInput));
+      const results4 = input.map((userInput) => Morphism.map(User, userInput));
       results4.forEach((res, index) => {
-        expect(res).toEqual(jasmine.objectContaining(output[index]));
+        expect(res).toEqual(expect.objectContaining(output[index]));
       });
     });
   });
 
-  describe('Mapper Instance', function() {
-    it('should provide a pure idempotent mapper function from the partial application', function() {
+  describe('Mapper Instance', function () {
+    it('should provide a pure idempotent mapper function from the partial application', function () {
       let schema = {
         user: ['firstName', 'lastName'],
         city: 'address.city',
@@ -273,7 +273,7 @@ describe('Morphism', () => {
     });
   });
 
-  describe('Schema', function() {
+  describe('Schema', function () {
     describe('Action Selector', () => {
       it('should accept a selector action in deep nested schema property', () => {
         interface Source {
@@ -325,7 +325,7 @@ describe('Morphism', () => {
           },
         });
       });
-      it('should compute function on data from specified path', function() {
+      it('should compute function on data from specified path', function () {
         let schema = {
           state: {
             path: 'address.state',
@@ -370,7 +370,7 @@ describe('Morphism', () => {
         interface Target {
           t1: string;
         }
-        const schema = createSchema<Target>({ t1: { fn: value => value.s1 } });
+        const schema = createSchema<Target>({ t1: { fn: (value) => value.s1 } });
         const result = morphism(schema, { s1: 'value' });
         expect(result.t1).toEqual('value');
       });
@@ -380,7 +380,7 @@ describe('Morphism', () => {
           t1: string;
         }
         const schema = createSchema<Target>({
-          t1: { fn: value => value.s1, validation: Validation.string() },
+          t1: { fn: (value) => value.s1, validation: Validation.string() },
         });
         const result = morphism(schema, { s1: 1234 });
         const errors = reporter.report(result);
@@ -404,8 +404,8 @@ describe('Morphism', () => {
         }).toThrow(`The action specified for prop is not supported.`);
       });
     });
-    describe('Function Predicate', function() {
-      it('should support es6 destructuring as function predicate', function() {
+    describe('Function Predicate', function () {
+      it('should support es6 destructuring as function predicate', function () {
         let schema = {
           target: ({ source }: { source: string }) => source,
         };
@@ -421,7 +421,7 @@ describe('Morphism', () => {
         expect(result.target.replace).toBeDefined();
       });
 
-      it('should support nesting mapping', function() {
+      it('should support nesting mapping', function () {
         let nestedSchema = {
           target1: 'source',
           target2: ({ nestedSource }: any) => nestedSource.source,
@@ -447,7 +447,7 @@ describe('Morphism', () => {
         expect(result).toEqual(expected);
       });
 
-      it('should be resilient when doing nesting mapping and using destructuration on array', function() {
+      it('should be resilient when doing nesting mapping and using destructuration on array', function () {
         let nestedSchema = {
           target: 'source',
           nestedTargets: ({ nestedSources }: any) => Morphism({ nestedTarget: ({ nestedSource }: any) => nestedSource }, nestedSources),
@@ -572,8 +572,8 @@ describe('Morphism', () => {
         }
         const schema = createSchema<Target, Source>(
           {
-            t1: { fn: value => value.s1, validation: Validation.string() },
-            t2: { fn: value => value.s1, validation: Validation.string() },
+            t1: { fn: (value) => value.s1, validation: Validation.string() },
+            t2: { fn: (value) => value.s1, validation: Validation.string() },
           },
           { validation: { throw: true } }
         );
@@ -602,8 +602,8 @@ describe('Morphism', () => {
     });
   });
 
-  describe('Paths Aggregation', function() {
-    it('should return a object of aggregated values given a array of paths', function() {
+  describe('Paths Aggregation', function () {
+    it('should return a object of aggregated values given a array of paths', function () {
       let schema = {
         user: ['firstName', 'lastName'],
       };
@@ -618,7 +618,7 @@ describe('Morphism', () => {
       expect(results[0]).toEqual(desiredResult);
     });
 
-    it('should return a object of aggregated values given a array of paths (nested path case)', function() {
+    it('should return a object of aggregated values given a array of paths (nested path case)', function () {
       let schema = {
         user: ['firstName', 'address.city'],
       };
@@ -652,8 +652,8 @@ describe('Morphism', () => {
     });
   });
 
-  describe('Flattening and Projection', function() {
-    it('should flatten data from specified path', function() {
+  describe('Flattening and Projection', function () {
+    it('should flatten data from specified path', function () {
       interface Source {
         firstName: string;
         lastName: string;
@@ -679,7 +679,7 @@ describe('Morphism', () => {
       expect(results[0]).toEqual(desiredResult);
     });
 
-    it('should pass the object value to the function when no path is specified', function() {
+    it('should pass the object value to the function when no path is specified', function () {
       interface D {
         firstName: string;
         lastName: string;
@@ -690,8 +690,8 @@ describe('Morphism', () => {
       let schema: StrictSchema<D, MockData> = {
         firstName: 'firstName',
         lastName: 'lastName',
-        city: { path: 'address.city', fn: prop => prop },
-        status: o => o.phoneNumber[0].type,
+        city: { path: 'address.city', fn: (prop) => prop },
+        status: (o) => o.phoneNumber[0].type,
       };
 
       let desiredResult = {
@@ -717,7 +717,7 @@ describe('Morphism', () => {
       }
 
       const schema: StrictSchema<Target, Source> = {
-        keyA: { keyA1: source => source.keyA },
+        keyA: { keyA1: (source) => source.keyA },
       };
 
       const target = morphism(schema, sample);
